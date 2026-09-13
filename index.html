@@ -81,14 +81,14 @@
         
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 12px;
         }
-        
+
         .form-grid.full {
             grid-template-columns: 1fr;
         }
-        
+
         .input-group {
             display: flex;
             flex-direction: column;
@@ -104,25 +104,12 @@
 
         input, select, textarea {
             width: 100%;
+            max-width: 100%;
             padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
-        }
-
-        @media (max-width: 480px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-group {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-save {
-                grid-column: 1;
-            }
         }
         
         input:focus, select:focus, textarea:focus {
