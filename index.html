@@ -1,532 +1,546 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社有車管理 - キャッスルハウス</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 1rem;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        
-        .subtitle {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 1.5rem;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .tab-btn {
-            padding: 10px 16px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #999;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        
-        .tab-btn.active {
-            color: #333;
-            border-bottom-color: #4ECDC4;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .form-section {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .form-grid.full {
-            grid-template-columns: 1fr;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            max-width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #4ECDC4;
-            box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.1);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-        
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 1rem;
-        }
-        
-        button {
-            padding: 10px 16px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        
-        .btn-reset {
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        
-        .btn-reset:hover {
-            background: #f5f5f5;
-        }
-        
-        .btn-save {
-            background: #4ECDC4;
-            color: white;
-            border: none;
-            grid-column: 1 / 3;
-        }
-        
-        .btn-save:hover {
-            background: #3eb8ae;
-        }
-        
-        .success-message {
-            background: #e8f8f5;
-            color: #0f6e56;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-        
-        .history-container {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-left: 4px solid #4ECDC4;
-        }
-        
-        .history-item.urgent {
-            border-left-color: #FF6B6B;
-        }
-        
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 8px;
-        }
-        
-        .history-title {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .history-date {
-            font-size: 12px;
-            color: #999;
-        }
-        
-        .history-detail {
-            font-size: 12px;
-            color: #666;
-            margin: 4px 0;
-        }
-        
-        .category-badge {
-            display: inline-block;
-            background: #4ECDC4;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-right: 6px;
-        }
-        
-        .category-badge.oil {
-            background: #FFA500;
-        }
-        
-        .category-badge.inspection {
-            background: #9B59B6;
-        }
-        
-        .category-badge.tire {
-            background: #3498DB;
-        }
-        
-        .category-badge.repair {
-            background: #E74C3C;
-        }
-        
-        .empty-message {
-            text-align: center;
-            color: #999;
-            padding: 2rem 1rem;
-            font-size: 14px;
-        }
-        
-        .stats {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        
-        .stat-box {
-            text-align: center;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 4px;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社有車整備台帳 - キャッスルハウス</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#EFEEE7;
+    --surface:#FFFFFF;
+    --surface-2:#F6F4EC;
+    --ink:#1B2B29;
+    --ink-soft:#5B6B67;
+    --ink-faint:#8B978F;
+    --line:#DBD6C8;
+    --line-soft:#E8E4D7;
+    --accent:#1F6F5C;
+    --accent-strong:#154F42;
+    --accent-soft:#E1EFEA;
+    --accent-ink:#FFFFFF;
+    --warn:#B4552F;
+    --warn-soft:#F5E4DA;
+    --warn-ink:#7C3A1F;
+    --cat-inspection:#1F6F5C;
+    --cat-oil:#A97A1E;
+    --cat-shaken:#4A4E8C;
+    --cat-tire:#35618C;
+    --cat-repair:#B4552F;
+    --shadow:0 1px 2px rgba(27,43,41,.07),0 10px 26px -14px rgba(27,43,41,.28);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#111B19;
+      --surface:#17211F;
+      --surface-2:#1D2926;
+      --ink:#E9EEEB;
+      --ink-soft:#A6B4AF;
+      --ink-faint:#71827B;
+      --line:#2A3936;
+      --line-soft:#22302D;
+      --accent:#42AD90;
+      --accent-strong:#5AC4A6;
+      --accent-soft:#1C332D;
+      --accent-ink:#08120F;
+      --warn:#DD8256;
+      --warn-soft:#33251F;
+      --warn-ink:#F3C6AD;
+      --cat-inspection:#42AD90;
+      --cat-oil:#D2A745;
+      --cat-shaken:#8A8EDC;
+      --cat-tire:#63A0D2;
+      --cat-repair:#DD8256;
+      --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 26px -14px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{background:var(--bg);}
+  body{
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New',"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    padding:20px 14px 60px;
+    margin:0;
+  }
+  .page{max-width:640px;margin:0 auto;}
+  header{margin-bottom:18px;}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  h1{font-family:'Shippori Mincho',serif;font-weight:700;font-size:clamp(23px,5.5vw,30px);line-height:1.3;margin-bottom:4px;}
+  .sub{color:var(--ink-soft);font-size:13px;}
+  .sync{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-faint);margin-top:8px;}
+  .sync .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);}
+  .sync.live .dot{background:var(--accent);}
+  .sync.live{color:var(--accent);}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0;}
+  .stat-tile{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius);padding:14px 16px;}
+  .stat-tile .label{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat-tile .value{font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:700;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .stat-tile.warn .value{color:var(--warn);}
+  .seg{display:flex;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:999px;padding:4px;gap:4px;margin-bottom:18px;}
+  .seg button{flex:1;padding:10px 12px;border:none;background:transparent;border-radius:999px;font:inherit;font-weight:700;font-size:14px;color:var(--ink-soft);cursor:pointer;}
+  .seg button.active{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+  .card h2{font-family:'Shippori Mincho',serif;font-size:17px;font-weight:700;margin-bottom:16px;color:var(--ink);}
+  form{display:flex;flex-direction:column;gap:14px;}
+  .row{display:flex;flex-wrap:wrap;gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 150px;}
+  .field.full{flex:1 1 100%;}
+  label{font-size:12px;font-weight:700;color:var(--ink-soft);}
+  label .req{color:var(--warn);font-weight:700;margin-left:2px;}
+  input,select,textarea{width:100%;min-width:0;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 11px;}
+  input::placeholder,textarea::placeholder{color:var(--ink-faint);}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea{resize:vertical;min-height:56px;}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px;}
+  .btn-row{display:flex;gap:10px;margin-top:4px;}
+  button.btn{font:inherit;font-weight:700;font-size:14px;padding:11px 18px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;}
+  button.btn:disabled{opacity:.5;cursor:not-allowed;}
+  button.btn-primary{flex:2;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  button.btn-primary:hover:not(:disabled){background:var(--accent-strong);border-color:var(--accent-strong);}
+  button.btn-ghost{flex:1;}
+  button.btn-ghost:hover{background:var(--surface-2);}
+  .hint{font-size:12px;color:var(--warn-ink);background:var(--warn-soft);border-radius:8px;padding:8px 10px;display:none;}
+  .hint.show{display:block;}
+  .due-card{border:1px solid var(--line-soft);border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;}
+  .due-card h3{font-size:13px;font-weight:700;color:var(--warn-ink);margin-bottom:8px;}
+  .due-item{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;color:var(--ink);}
+  .due-item + .due-item{border-top:1px dashed rgba(0,0,0,.08);}
+  .due-item .badge{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;white-space:nowrap;}
+  .due-item .badge.over{color:var(--warn);}
+  .breakdown{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .chip{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);font-weight:500;}
+  .chip .amt{font-family:'JetBrains Mono',monospace;font-weight:700;margin-left:4px;}
+  .filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .filters select{flex:1 1 140px;}
+  .history-list{display:flex;flex-direction:column;gap:8px;}
+  .history-item{background:var(--surface);border:1px solid var(--line-soft);border-left:4px solid var(--cat-inspection);border-radius:10px;padding:12px 14px;}
+  .history-item[data-cat="oil"]{border-left-color:var(--cat-oil);}
+  .history-item[data-cat="inspection_major"]{border-left-color:var(--cat-shaken);}
+  .history-item[data-cat="tire"]{border-left-color:var(--cat-tire);}
+  .history-item[data-cat="repair"]{border-left-color:var(--cat-repair);}
+  .hi-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;}
+  .hi-title{font-weight:700;font-size:14px;}
+  .hi-date{font-size:12px;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+  .cat-pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--cat-inspection);color:#fff;margin-right:6px;}
+  .history-item[data-cat="oil"] .cat-pill{background:var(--cat-oil);}
+  .history-item[data-cat="inspection_major"] .cat-pill{background:var(--cat-shaken);}
+  .history-item[data-cat="tire"] .cat-pill{background:var(--cat-tire);}
+  .history-item[data-cat="repair"] .cat-pill{background:var(--cat-repair);}
+  .hi-detail{font-size:12.5px;color:var(--ink-soft);margin:2px 0;}
+  .hi-detail b{color:var(--ink);font-weight:500;}
+  .hi-foot{display:flex;justify-content:flex-end;margin-top:6px;gap:8px;}
+  .link-btn{background:none;border:none;font:inherit;font-size:12px;color:var(--ink-faint);cursor:pointer;padding:2px 4px;}
+  .link-btn:hover{color:var(--warn);}
+  .confirm-row{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--warn-ink);}
+  .confirm-row button{font:inherit;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;padding:2px 6px;}
+  .confirm-row .yes{color:var(--warn);}
+  .confirm-row .no{color:var(--ink-faint);}
+  .empty{text-align:center;color:var(--ink-faint);padding:36px 10px;font-size:13px;border:1px dashed var(--line);border-radius:var(--radius);}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,10px);background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;padding:10px 18px;border-radius:999px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10;}
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+  .toast.err{background:var(--warn);color:#fff;}
+  .offline-banner{background:var(--warn-soft);color:var(--warn-ink);border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:16px;display:none;}
+  .offline-banner.show{display:block;}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚗 社有車管理</h1>
-        <p class="subtitle">車検・整備・修理の記録管理</p>
-        
-        <div id="successMessage" class="success-message">記録を保存しました！</div>
-        
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('new')">新規記録</button>
-            <button class="tab-btn" onclick="switchTab('history')">整備履歴</button>
+<div class="page">
+  <header>
+    <div class="eyebrow">キャッスルハウス</div>
+    <h1>社有車 整備台帳</h1>
+    <p class="sub">車検・点検・修理の記録を4名で共有管理</p>
+    <div class="sync" id="syncIndicator"><span class="dot"></span><span id="syncLabel">接続中…</span></div>
+  </header>
+
+  <div class="offline-banner" id="offlineBanner">共有シートに接続できませんでした。しばらくしてから再読み込みしてください。</div>
+
+  <div class="stats">
+    <div class="stat-tile"><div class="label">総記録数</div><div class="value" id="statTotal">–</div></div>
+    <div class="stat-tile"><div class="label">今月の費用合計</div><div class="value" id="statCost">–</div></div>
+    <div class="stat-tile warn"><div class="label">まもなくの予定</div><div class="value" id="statDue">–</div></div>
+  </div>
+
+  <div class="seg">
+    <button type="button" id="tabBtnNew" class="active">新規記録</button>
+    <button type="button" id="tabBtnHistory">履歴・集計</button>
+  </div>
+
+  <div class="panel active" id="panelNew">
+    <div class="card">
+      <h2>整備・修理を記録する</h2>
+      <form id="recordForm">
+        <div class="row">
+          <div class="field">
+            <label for="fDate">実施日<span class="req">*必須</span></label>
+            <input type="date" id="fDate" required>
+          </div>
+          <div class="field">
+            <label for="fUser">使用者<span class="req">*必須</span></label>
+            <input type="text" id="fUser" placeholder="例：田中" list="userList" required>
+            <datalist id="userList"></datalist>
+          </div>
         </div>
-        
-        <!-- 新規記録タブ -->
-        <div id="new" class="tab-content active">
-            <div class="form-section">
-                <h2 style="font-size: 16px; margin-bottom: 1rem;">整備・修理記録</h2>
-                
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label for="date">実施日 <span style="color: red;">*必須</span></label>
-                        <input type="date" id="date">
-                    </div>
-                    <div class="input-group">
-                        <label for="user">使用者 <span style="color: red;">*必須</span></label>
-                        <input type="text" id="user" placeholder="名前を入力">
-                    </div>
-                </div>
-                
-                <div class="form-grid full" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="carInfo">車種・ナンバー <span style="color: red;">*必須</span></label>
-                        <input type="text" id="carInfo" placeholder="例：トヨタ・プリウス（福岡501ア1234）">
-                    </div>
-                </div>
-                
-                <div class="form-grid" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="distance">実施時走行距離(km)</label>
-                        <input type="number" id="distance" placeholder="km">
-                    </div>
-                    <div class="input-group">
-                        <label for="category">区分 <span style="color: red;">*必須</span></label>
-                        <select id="category">
-                            <option value="">選択してください</option>
-                            <option value="inspection">定期点検</option>
-                            <option value="oil">オイル交換</option>
-                            <option value="inspection_major">車検</option>
-                            <option value="tire">タイヤ交換</option>
-                            <option value="repair">修理</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-grid full" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="content">実施内容</label>
-                        <textarea id="content" placeholder="例：エンジンオイル・オイルフィルター交換"></textarea>
-                    </div>
-                </div>
-                
-                <div class="form-grid" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="shop">実施店・整備工場</label>
-                        <input type="text" id="shop" placeholder="例：〇〇自動車整備工場">
-                    </div>
-                    <div class="input-group">
-                        <label for="cost">費用(税込)</label>
-                        <input type="number" id="cost" placeholder="円">
-                    </div>
-                </div>
-                
-                <div class="form-grid full" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="nextSchedule">次回目安（日数）</label>
-                        <input type="number" id="nextSchedule" placeholder="例：180（日）">
-                    </div>
-                </div>
-                
-                <div class="form-grid full" style="margin-top: 12px;">
-                    <div class="input-group">
-                        <label for="memo">備考</label>
-                        <textarea id="memo" placeholder="その他の情報"></textarea>
-                    </div>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn-reset" onclick="resetForm()">リセット</button>
-                    <button class="btn-save" onclick="saveRecord()">記録を保存</button>
-                </div>
-            </div>
+
+        <div class="field full">
+          <label for="fCar">車種・ナンバー<span class="req">*必須</span></label>
+          <input type="text" id="fCar" placeholder="例：トヨタ・プリウス（福岡501あ1234）" list="carList" required>
+          <datalist id="carList"></datalist>
         </div>
-        
-        <!-- 整備履歴タブ -->
-        <div id="history" class="tab-content">
-            <div class="form-section">
-                <div class="stats">
-                    <div class="stat-box">
-                        <div class="stat-label">総記録数</div>
-                        <div class="stat-value" id="totalCount">0</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">今月の費用</div>
-                        <div class="stat-value" id="monthCost">¥0</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="history-container" id="historyList">
-                <div class="empty-message">まだ記録がありません</div>
-            </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="fDistance">実施時走行距離(km)</label>
+            <input type="number" id="fDistance" placeholder="km" min="0">
+          </div>
+          <div class="field">
+            <label for="fCategory">区分<span class="req">*必須</span></label>
+            <select id="fCategory" required>
+              <option value="">選択してください</option>
+              <option value="inspection">定期点検</option>
+              <option value="oil">オイル交換</option>
+              <option value="inspection_major">車検</option>
+              <option value="tire">タイヤ交換</option>
+              <option value="repair">修理</option>
+            </select>
+          </div>
         </div>
+
+        <div class="field full">
+          <label for="fContent">実施内容</label>
+          <textarea id="fContent" placeholder="例：エンジンオイル・オイルフィルター交換"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="fShop">実施店・整備工場</label>
+            <input type="text" id="fShop" placeholder="例：〇〇自動車整備工場">
+          </div>
+          <div class="field">
+            <label for="fCost">費用(税込)</label>
+            <input type="number" id="fCost" placeholder="円" min="0">
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="fNext">次回目安（日数）</label>
+          <input type="number" id="fNext" placeholder="例：180（日）" min="0">
+        </div>
+
+        <div class="field full">
+          <label for="fMemo">備考</label>
+          <textarea id="fMemo" placeholder="その他の情報"></textarea>
+        </div>
+
+        <div class="hint" id="formHint">必須項目（実施日・使用者・車種＆ナンバー・区分）を入力してください。</div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" id="resetBtn">リセット</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">記録を保存</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <script>
-        const categories = {
-            'inspection': '定期点検',
-            'oil': 'オイル交換',
-            'inspection_major': '車検',
-            'tire': 'タイヤ交換',
-            'repair': '修理'
-        };
+  <div class="panel" id="panelHistory">
+    <div id="dueCard"></div>
+    <div class="card">
+      <h2>費用の内訳（今月・使用者別）</h2>
+      <div class="breakdown" id="breakdown"><span class="chip">読み込み中…</span></div>
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('active');
-            });
-            document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
-            
-            if (tab === 'history') {
-                displayHistory();
-            }
-        }
+      <h2 style="margin-top:22px;">履歴</h2>
+      <div class="filters">
+        <select id="filterUser"><option value="__all__">全員</option></select>
+        <select id="filterCategory">
+          <option value="__all__">全区分</option>
+          <option value="inspection">定期点検</option>
+          <option value="oil">オイル交換</option>
+          <option value="inspection_major">車検</option>
+          <option value="tire">タイヤ交換</option>
+          <option value="repair">修理</option>
+        </select>
+      </div>
+      <div class="history-list" id="historyList"><div class="empty">読み込み中…</div></div>
+    </div>
+  </div>
 
-        function saveRecord() {
-            const date = document.getElementById('date').value;
-            const user = document.getElementById('user').value;
-            const carInfo = document.getElementById('carInfo').value;
-            const category = document.getElementById('category').value;
-            
-            if (!date || !user || !carInfo || !category) {
-                alert('必須項目を入力してください');
-                return;
-            }
-            
-            const record = {
-                date,
-                user,
-                carInfo,
-                distance: document.getElementById('distance').value || '-',
-                category,
-                content: document.getElementById('content').value,
-                shop: document.getElementById('shop').value,
-                cost: document.getElementById('cost').value || 0,
-                nextSchedule: document.getElementById('nextSchedule').value,
-                memo: document.getElementById('memo').value,
-                savedAt: new Date().toLocaleString('ja-JP')
-            };
-            
-            let records = JSON.parse(localStorage.getItem('carRecords') || '[]');
-            records.unshift(record);
-            localStorage.setItem('carRecords', JSON.stringify(records));
-            
-            const msg = document.getElementById('successMessage');
-            msg.style.display = 'block';
-            setTimeout(() => {
-                msg.style.display = 'none';
-            }, 2000);
-            
-            resetForm();
-        }
+  <div class="toast" id="toast"></div>
+</div>
 
-        function resetForm() {
-            document.getElementById('date').value = '';
-            document.getElementById('user').value = '';
-            document.getElementById('carInfo').value = '';
-            document.getElementById('distance').value = '';
-            document.getElementById('category').value = '';
-            document.getElementById('content').value = '';
-            document.getElementById('shop').value = '';
-            document.getElementById('cost').value = '';
-            document.getElementById('nextSchedule').value = '';
-            document.getElementById('memo').value = '';
-        }
+<script>
+(function(){
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCdGNYYGQiYPA8WZQRGrKurQ9DLrrUwPi-V4jADvutper2y4wONOCbRsDQuQTwgFzq/exec';
+  const CATS = {
+    inspection:{label:'定期点検'},
+    oil:{label:'オイル交換'},
+    inspection_major:{label:'車検'},
+    tire:{label:'タイヤ交換'},
+    repair:{label:'修理'}
+  };
 
-        function getCategoryBadgeClass(category) {
-            const classes = {
-                'inspection': 'inspection',
-                'oil': 'oil',
-                'inspection_major': 'inspection',
-                'tire': 'tire',
-                'repair': 'repair'
-            };
-            return classes[category] || '';
-        }
+  let records = [];
+  let loaded = false;
+  let filterUser = '__all__';
+  let filterCategory = '__all__';
+  let pendingDelete = null;
 
-        function displayHistory() {
-            const records = JSON.parse(localStorage.getItem('carRecords') || '[]');
-            const container = document.getElementById('historyList');
-            
-            if (records.length === 0) {
-                container.innerHTML = '<div class="empty-message">まだ記録がありません</div>';
-                document.getElementById('totalCount').textContent = '0';
-                document.getElementById('monthCost').textContent = '¥0';
-                return;
-            }
-            
-            // 統計計算
-            const now = new Date();
-            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            let monthCost = 0;
-            
-            records.forEach(record => {
-                if (record.date.startsWith(currentMonth)) {
-                    monthCost += parseInt(record.cost) || 0;
-                }
-            });
-            
-            document.getElementById('totalCount').textContent = records.length;
-            document.getElementById('monthCost').textContent = `¥${monthCost.toLocaleString()}`;
-            
-            // 履歴表示
-            container.innerHTML = records.map((record, idx) => `
-                <div class="history-item ${record.category === 'repair' ? 'urgent' : ''}">
-                    <div class="history-header">
-                        <div>
-                            <span class="category-badge ${getCategoryBadgeClass(record.category)}">
-                                ${categories[record.category]}
-                            </span>
-                            <span class="history-title">${record.carInfo}</span>
-                        </div>
-                        <span class="history-date">${record.date}</span>
-                    </div>
-                    <div class="history-detail">
-                        <strong>使用者:</strong> ${record.user}
-                        ${record.distance !== '-' ? ` | <strong>走行距離:</strong> ${record.distance}km` : ''}
-                    </div>
-                    ${record.content ? `<div class="history-detail"><strong>内容:</strong> ${record.content}</div>` : ''}
-                    ${record.shop ? `<div class="history-detail"><strong>実施店:</strong> ${record.shop}</div>` : ''}
-                    ${record.cost ? `<div class="history-detail"><strong>費用:</strong> ¥${parseInt(record.cost).toLocaleString()}</div>` : ''}
-                    ${record.nextSchedule ? `<div class="history-detail"><strong>次回目安:</strong> ${record.nextSchedule}日後</div>` : ''}
-                    ${record.memo ? `<div class="history-detail"><strong>備考:</strong> ${record.memo}</div>` : ''}
-                </div>
-            `).join('');
-        }
+  const $ = id => document.getElementById(id);
 
-        // 初期化
-        document.getElementById('date').valueAsDate = new Date();
-    </script>
+  function todayStr(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+
+  function yen(n){ return '¥' + Math.round(n||0).toLocaleString('ja-JP'); }
+
+  function toast(msg, isErr){
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isErr ? ' err' : '');
+    clearTimeout(toast._h);
+    toast._h = setTimeout(function(){ t.className = 'toast'; }, 2600);
+  }
+
+  function switchTab(tab){
+    $('tabBtnNew').classList.toggle('active', tab==='new');
+    $('tabBtnHistory').classList.toggle('active', tab==='history');
+    $('panelNew').classList.toggle('active', tab==='new');
+    $('panelHistory').classList.toggle('active', tab==='history');
+  }
+  $('tabBtnNew').addEventListener('click', function(){ switchTab('new'); });
+  $('tabBtnHistory').addEventListener('click', function(){ switchTab('history'); });
+
+  $('fDate').value = todayStr();
+
+  $('resetBtn').addEventListener('click', function(){
+    $('recordForm').reset();
+    $('fDate').value = todayStr();
+    $('formHint').classList.remove('show');
+  });
+
+  $('recordForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const date = $('fDate').value;
+    const user = $('fUser').value.trim();
+    const carInfo = $('fCar').value.trim();
+    const category = $('fCategory').value;
+
+    if(!date || !user || !carInfo || !category){
+      $('formHint').classList.add('show');
+      return;
+    }
+    $('formHint').classList.remove('show');
+
+    const data = {
+      date: date, user: user, carInfo: carInfo, category: category,
+      distance: $('fDistance').value ? Number($('fDistance').value) : '',
+      content: $('fContent').value.trim(),
+      shop: $('fShop').value.trim(),
+      cost: $('fCost').value ? Number($('fCost').value) : 0,
+      nextSchedule: $('fNext').value ? Number($('fNext').value) : '',
+      memo: $('fMemo').value.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    $('saveBtn').disabled = true;
+    $('saveBtn').textContent = '保存中…';
+    apiPost(data).then(function(res){
+      if(res && res.ok){
+        $('recordForm').reset();
+        $('fDate').value = todayStr();
+        toast('記録を保存しました');
+        loadRecords();
+      }else{
+        toast('保存に失敗しました。もう一度お試しください。', true);
+      }
+    }).catch(function(){
+      toast('保存に失敗しました。通信環境をご確認ください。', true);
+    }).finally(function(){
+      $('saveBtn').disabled = false;
+      $('saveBtn').textContent = '記録を保存';
+    });
+  });
+
+  $('filterUser').addEventListener('change', function(e){ filterUser = e.target.value; renderHistory(); });
+  $('filterCategory').addEventListener('change', function(e){ filterCategory = e.target.value; renderHistory(); });
+
+  function apiGet(){
+    return fetch(SCRIPT_URL, { method:'GET' }).then(function(r){ return r.json(); });
+  }
+  function apiPost(payload){
+    return fetch(SCRIPT_URL, {
+      method:'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); });
+  }
+
+  function doDelete(id){
+    apiPost({action:'delete', id:id}).then(function(){
+      toast('記録を削除しました');
+      loadRecords();
+    }).catch(function(){
+      toast('削除に失敗しました', true);
+    });
+    pendingDelete = null;
+  }
+
+  function computeDue(list){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const byKey = {};
+    list.forEach(function(r){
+      if(!r.nextSchedule || !r.date) return;
+      const key = r.carInfo + '|' + r.category;
+      if(!byKey[key] || r.date > byKey[key].date) byKey[key] = r;
+    });
+    return Object.keys(byKey).map(function(key){
+      const r = byKey[key];
+      const due = new Date(r.date);
+      due.setDate(due.getDate() + Number(r.nextSchedule));
+      const daysLeft = Math.round((due - today) / 86400000);
+      const copy = Object.assign({}, r);
+      copy.daysLeft = daysLeft;
+      return copy;
+    }).filter(function(r){ return r.daysLeft <= 14; }).sort(function(a,b){ return a.daysLeft - b.daysLeft; });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function renderStats(){
+    const total = records.length;
+    const ym = todayStr().slice(0,7);
+    let monthCost = 0;
+    const byUser = {};
+    records.forEach(function(r){
+      if(r.date && r.date.slice(0,7) === ym){
+        const c = Number(r.cost) || 0;
+        monthCost += c;
+        byUser[r.user] = (byUser[r.user] || 0) + c;
+      }
+    });
+    const due = computeDue(records);
+
+    $('statTotal').textContent = total;
+    $('statCost').textContent = yen(monthCost);
+    $('statDue').textContent = due.length;
+
+    const entries = Object.keys(byUser).map(function(u){ return [u, byUser[u]]; }).sort(function(a,b){ return b[1]-a[1]; });
+    if(entries.length === 0){
+      $('breakdown').innerHTML = '<span class="chip">今月の記録はまだありません</span>';
+    }else{
+      $('breakdown').innerHTML = entries.map(function(e){
+        return '<span class="chip">' + escapeHtml(e[0]) + '<span class="amt">' + yen(e[1]) + '</span></span>';
+      }).join('');
+    }
+
+    if(due.length === 0){
+      $('dueCard').innerHTML = '';
+    }else{
+      $('dueCard').innerHTML = '<div class="due-card"><h3>まもなくの予定（' + due.length + '件）</h3>' +
+        due.map(function(r){
+          const label = r.daysLeft < 0 ? (Math.abs(r.daysLeft) + '日超過') : (r.daysLeft===0 ? '本日期限' : ('あと' + r.daysLeft + '日'));
+          const cls = r.daysLeft < 0 ? 'over' : '';
+          const catLabel = CATS[r.category] ? CATS[r.category].label : r.category;
+          return '<div class="due-item"><span>' + escapeHtml(r.carInfo) + '・' + catLabel + '</span><span class="badge ' + cls + '">' + label + '</span></div>';
+        }).join('') + '</div>';
+    }
+
+    const users = uniqueSorted(records.map(function(r){ return r.user; }));
+    const cars = uniqueSorted(records.map(function(r){ return r.carInfo; }));
+    $('userList').innerHTML = users.map(function(u){ return '<option value="' + escapeHtml(u) + '">'; }).join('');
+    $('carList').innerHTML = cars.map(function(c){ return '<option value="' + escapeHtml(c) + '">'; }).join('');
+
+    const curUserFilter = $('filterUser').value;
+    $('filterUser').innerHTML = '<option value="__all__">全員</option>' +
+      users.map(function(u){ return '<option value="' + escapeHtml(u) + '">' + escapeHtml(u) + '</option>'; }).join('');
+    if(users.indexOf(curUserFilter) !== -1) $('filterUser').value = curUserFilter;
+  }
+
+  function uniqueSorted(arr){
+    const seen = {};
+    const out = [];
+    arr.forEach(function(v){
+      if(v && !seen[v]){ seen[v] = true; out.push(v); }
+    });
+    return out.sort();
+  }
+
+  function renderHistory(){
+    let list = records.slice();
+    if(filterUser !== '__all__') list = list.filter(function(r){ return r.user === filterUser; });
+    if(filterCategory !== '__all__') list = list.filter(function(r){ return r.category === filterCategory; });
+
+    if(!loaded){
+      $('historyList').innerHTML = '<div class="empty">読み込み中…</div>';
+      return;
+    }
+    if(list.length === 0){
+      $('historyList').innerHTML = '<div class="empty">まだ記録がありません。「新規記録」タブから最初の記録を登録しましょう。</div>';
+      return;
+    }
+
+    $('historyList').innerHTML = list.map(function(r){
+      const cat = CATS[r.category] ? CATS[r.category].label : r.category;
+      const isPending = pendingDelete === r.id;
+      let html = '<div class="history-item" data-cat="' + r.category + '">';
+      html += '<div class="hi-top"><div class="hi-title"><span class="cat-pill">' + cat + '</span>' + escapeHtml(r.carInfo || '') + '</div><div class="hi-date">' + (r.date || '') + '</div></div>';
+      html += '<div class="hi-detail"><b>使用者:</b> ' + escapeHtml(r.user || '') + (r.distance ? (' ｜ <b>走行距離:</b> ' + r.distance + 'km') : '') + '</div>';
+      if(r.content) html += '<div class="hi-detail"><b>内容:</b> ' + escapeHtml(r.content) + '</div>';
+      if(r.shop) html += '<div class="hi-detail"><b>実施店:</b> ' + escapeHtml(r.shop) + '</div>';
+      if(r.cost) html += '<div class="hi-detail"><b>費用:</b> ' + yen(r.cost) + '</div>';
+      if(r.nextSchedule) html += '<div class="hi-detail"><b>次回目安:</b> ' + r.nextSchedule + '日後</div>';
+      if(r.memo) html += '<div class="hi-detail"><b>備考:</b> ' + escapeHtml(r.memo) + '</div>';
+      html += '<div class="hi-foot">';
+      if(isPending){
+        html += '<span class="confirm-row">本当に削除しますか？<button class="yes" data-yes="' + r.id + '">削除する</button><button class="no" data-no="1">キャンセル</button></span>';
+      }else{
+        html += '<button class="link-btn" data-del="' + r.id + '">削除</button>';
+      }
+      html += '</div></div>';
+      return html;
+    }).join('');
+
+    Array.prototype.forEach.call($('historyList').querySelectorAll('[data-del]'), function(btn){
+      btn.addEventListener('click', function(){ pendingDelete = btn.getAttribute('data-del'); renderHistory(); });
+    });
+    Array.prototype.forEach.call($('historyList').querySelectorAll('[data-yes]'), function(btn){
+      btn.addEventListener('click', function(){ doDelete(btn.getAttribute('data-yes')); });
+    });
+    Array.prototype.forEach.call($('historyList').querySelectorAll('[data-no]'), function(btn){
+      btn.addEventListener('click', function(){ pendingDelete = null; renderHistory(); });
+    });
+  }
+
+  function renderAll(){
+    renderStats();
+    renderHistory();
+  }
+
+  function loadRecords(){
+    apiGet().then(function(data){
+      records = (data || []).slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+      loaded = true;
+      $('offlineBanner').classList.remove('show');
+      $('syncIndicator').classList.add('live');
+      $('syncLabel').textContent = '全員のデータと同期済み';
+      renderAll();
+    }).catch(function(){
+      $('offlineBanner').classList.add('show');
+      $('syncIndicator').classList.remove('live');
+      $('syncLabel').textContent = '同期エラー';
+    });
+  }
+
+  loadRecords();
+  setInterval(loadRecords, 15000);
+})();
+</script>
 </body>
 </html>
